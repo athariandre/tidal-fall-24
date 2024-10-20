@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import sqlite3
 import numpy as np
 from scipy.spatial import distance
 
 app = Flask(__name__)
+CORS(app)
 
 def get_db_connection():
     conn = sqlite3.connect('/Users/andre/Projects/competition/tidal-fall-24/vectorization/data/databases/tempmerge.db')
@@ -60,8 +62,8 @@ def get_similar_songs():
     # Assuming you have a 'features' column in your 'songs' table that stores the 17-dimensional feature vector
     # Construct the target feature vector using the specified columns
     target_vector = np.array([
-        song['danceability'], song['acousticness'], song['instrumentalness'], song['liveness'], song['mode'],
-        song['speechiness'], song['tempo_x'], song['valence'], song['zcr'], song['spectral_contrast_mean'],
+        song['danceability'], song['acousticness'], song['instrumentalness'], song['liveness'],
+        song['speechiness'], song['valence'], song['zcr'], song['spectral_contrast_mean'],
         song['chroma_mean'], song['mfccs_mean'], song['spectral_contrast_std'], song['chroma_std'], song['mfccs_std']
     ])
     
@@ -72,8 +74,8 @@ def get_similar_songs():
     # Extract feature vectors from all songs
     vectors = np.array([
         [
-            song['danceability'], song['acousticness'], song['instrumentalness'], song['liveness'], song['mode'],
-            song['speechiness'], song['tempo_x'], song['valence'], song['zcr'], song['spectral_contrast_mean'],
+            song['danceability'], song['acousticness'], song['instrumentalness'], song['liveness'],
+            song['speechiness'], song['valence'], song['zcr'], song['spectral_contrast_mean'],
             song['chroma_mean'], song['mfccs_mean'], song['spectral_contrast_std'], song['chroma_std'], song['mfccs_std']
         ] for song in all_songs
     ])
