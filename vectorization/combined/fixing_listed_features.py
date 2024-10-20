@@ -28,7 +28,21 @@ for col in columns_to_process:
 
 # Save the updated dataframe back to the SQLite database
 # Create a new table with the updated schema
-df.to_sql('updated_songs', conn, if_exists='replace', index=False)
+# Add new columns to the existing table
+for col in [f'{col}_mean' for col in columns_to_process] + [f'{col}_std' for col in columns_to_process]:
+    conn.execute(f'ALTER TABLE merged_songs ADD COLUMN {col} REAL')
+
+# Update the existing table with the new data
+for index, row in df.iterrows():
+    update_query = f"""
+    UPDATE merged_songs
+    SET {', '.join([f"{col} = ?" for col in [f'{col}_mean' for col in columns_to_process] + [f'{col}_std' for col in columns_to_process]])}
+    WHERE id = ?
+    """
+    conn.execute(update_query, tuple(row[[f'{col}_mean' for col in columns_to_process] + [f'{col}_std' for col in columns_to_process]]) + (row['id'],))
+
+# Commit the changes
+conn.commit()
 
 # Close the connection
 conn.close()
